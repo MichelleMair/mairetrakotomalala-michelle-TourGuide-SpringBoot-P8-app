@@ -1,0 +1,10 @@
+/target/
+.classpath
+.project
+.settings
+.log
+.apt_generated
+.factorypath
+.springBeans
+.DS_Store
+Thumbs.db
