@@ -94,12 +94,12 @@ public class TestPerformance {
 		//Using stopwatch to measure the rewards calculation performance
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-
-		//Calling the methods calculateAllRewards() which calculate rewards for users
-		rewardsService.calculateAllRewards(allUsers);
 		
+		rewardsService.calculateAllRewards(allUsers);
+	
 		stopWatch.stop();
-
+		tourGuideService.tracker.stopTracking();
+	
 		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime())
 				+ " seconds.");
 		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
