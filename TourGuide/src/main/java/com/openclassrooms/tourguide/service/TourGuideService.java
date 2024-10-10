@@ -10,6 +10,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -35,6 +38,8 @@ public class TourGuideService {
 	private final GpsUtil gpsUtil;
 	private final RewardsService rewardsService;
 	private final TripPricer tripPricer = new TripPricer();
+	//Create a pool with 200 threads 
+	private final ExecutorService executorService = Executors.newFixedThreadPool(200);
 	public final Tracker tracker;
 	boolean testMode = true;
 
@@ -92,6 +97,22 @@ public class TourGuideService {
 		user.addToVisitedLocations(visitedLocation);
 		rewardsService.calculateRewards(user);
 		return visitedLocation;
+	}
+	
+	//Tracking multiple users in the same time to handle a large group of users
+	public Map<UUID, VisitedLocation> trackUsersLocation(List<User> users) {
+		Map<UUID, VisitedLocation> visitedLocationMap = new HashMap<>();
+		
+		//For each user, run the async task to track user location
+		users.forEach(user -> 
+			CompletableFuture.supplyAsync(() -> {
+				VisitedLocation visitedLocation = trackUserLocation(user);
+				visitedLocationMap.put(user.getUserId(), visitedLocation);
+				return visitedLocation;
+			}, executorService)
+		);
+		//return the map with users locations
+		return visitedLocationMap;
 	}
 
 	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
