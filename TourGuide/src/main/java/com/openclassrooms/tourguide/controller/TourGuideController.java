@@ -5,14 +5,15 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.openclassrooms.tourguide.dto.NearByAttractionDto;
 import com.openclassrooms.tourguide.model.User;
 import com.openclassrooms.tourguide.model.UserReward;
 import com.openclassrooms.tourguide.service.TourGuideService;
 import com.openclassrooms.tourguide.service.UserService;
 
-import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
 import tripPricer.Provider;
 
@@ -21,6 +22,7 @@ public class TourGuideController {
 
 	@Autowired
 	TourGuideService tourGuideService;
+	@Autowired
 	UserService userService;
 	
     @RequestMapping("/")
@@ -43,8 +45,10 @@ public class TourGuideController {
         // The reward points for visiting each Attraction.
         //    Note: Attraction reward points can be gathered from RewardsCentral
     @RequestMapping("/getNearbyAttractions") 
-    public List<Attraction> getNearbyAttractions(@RequestParam String userName) {
-    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
+    @ResponseBody
+    public List<NearByAttractionDto> getNearbyAttractions(@RequestParam String userName) {
+    	User user = userService.getUser(userName);
+    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(user);
     	return tourGuideService.getNearByAttractions(visitedLocation);
     }
     

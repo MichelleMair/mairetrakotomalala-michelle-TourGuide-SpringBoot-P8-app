@@ -1,6 +1,7 @@
 package com.openclassrooms.tourguide.service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -57,7 +58,7 @@ public class RewardsService {
 	            for (Attraction attraction : attractions) {
 	            	if (user.getUserRewards().stream().noneMatch(r -> r.attraction.attractionName.equals(attraction.attractionName))) {
 	            		if (nearAttraction(visitedLocation, attraction)) {
-	            			UserReward userReward = new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user));
+	            			UserReward userReward = new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user.getUserId()));
 	            			user.addUserReward(userReward);
 	            		}
 	            	}
@@ -103,8 +104,8 @@ public class RewardsService {
 		return getDistance(attraction, visitedLocation.location) <= proximityBuffer;
 	}
 	
-	private int getRewardPoints(Attraction attraction, User user) {
-		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
+	public int getRewardPoints(Attraction attraction, UUID userId) {
+		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, userId);
 	}
 	
 	public double getDistance(Location loc1, Location loc2) {

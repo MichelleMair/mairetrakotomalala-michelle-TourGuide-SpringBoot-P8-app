@@ -1,6 +1,6 @@
 package com.openclassrooms.tourguide.service;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -9,18 +9,20 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.openclassrooms.tourguide.dto.NearByAttractionDto;
 import com.openclassrooms.tourguide.model.User;
 import com.openclassrooms.tourguide.model.UserReward;
 import com.openclassrooms.tourguide.tracker.Tracker;
 
 import gpsUtil.GpsUtil;
-import gpsUtil.location.Attraction;
+import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
@@ -103,15 +105,20 @@ public class TourGuideService {
 		return visitedLocationMap;
 	}
 
-	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
-		List<Attraction> nearbyAttractions = new ArrayList<>();
-		for (Attraction attraction : gpsUtil.getAttractions()) {
-			if (rewardsService.isWithinAttractionProximity(attraction, visitedLocation.location)) {
-				nearbyAttractions.add(attraction);
-			}
-		}
-
-		return nearbyAttractions;
+	public List<NearByAttractionDto> getNearByAttractions(VisitedLocation visitedLocation) {
+		return gpsUtil.getAttractions().stream().map(attraction -> {
+			double distance = rewardsService.getDistance(attraction, visitedLocation.location);
+			int rewardPoints = rewardsService.getRewardPoints(attraction, visitedLocation.userId);
+			return new NearByAttractionDto(
+					attraction.attractionName,
+					new Location(attraction.latitude, attraction.longitude),
+					new Location(visitedLocation.location.latitude, visitedLocation.location.longitude),
+					distance,
+					rewardPoints);					
+		})
+		.sorted(Comparator.comparingDouble(dto -> dto.distance))
+		.limit(5)
+		.collect(Collectors.toList());
 	}
 	
 	public void clearUserData(List<User> users) {
