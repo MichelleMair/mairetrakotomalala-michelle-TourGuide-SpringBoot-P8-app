@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.openclassrooms.tourguide.helper.InternalTestHelper;
@@ -14,6 +15,7 @@ import com.openclassrooms.tourguide.model.User;
 import com.openclassrooms.tourguide.model.UserReward;
 import com.openclassrooms.tourguide.service.RewardsService;
 import com.openclassrooms.tourguide.service.TourGuideService;
+import com.openclassrooms.tourguide.service.UserService;
 
 import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
@@ -22,13 +24,24 @@ import rewardCentral.RewardCentral;
 
 public class TestRewardsService {
 
+	private RewardsService rewardsService;
+	private TourGuideService tourGuideService;
+	private GpsUtil gpsUtil;
+	private List<User> allUsers;
+	
+	@BeforeEach
+	public void setUp() {
+		gpsUtil = new GpsUtil();
+		rewardsService = new RewardsService(gpsUtil, new RewardCentral());		
+		UserService userService = new UserService();
+		tourGuideService = new TourGuideService(gpsUtil, rewardsService, userService);
+		
+		allUsers = userService.getAllUsers();
+	}
+
 	@Test
 	public void userGetRewards() {
-		GpsUtil gpsUtil = new GpsUtil();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
-
 		InternalTestHelper.setInternalUserNumber(0);
-		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		Attraction attraction = gpsUtil.getAttractions().get(0);
@@ -41,24 +54,21 @@ public class TestRewardsService {
 
 	@Test
 	public void isWithinAttractionProximity() {
-		GpsUtil gpsUtil = new GpsUtil();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		Attraction attraction = gpsUtil.getAttractions().get(0);
 		assertTrue(rewardsService.isWithinAttractionProximity(attraction, attraction));
 	}
 
-	// @Disabled  Needs fixed - can throw ConcurrentModificationException
+	//@Disabled  //Needs fixed - can throw ConcurrentModificationException
 	@Test
 	public void nearAllAttractions() {
-		GpsUtil gpsUtil = new GpsUtil();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		rewardsService.setProximityBuffer(Integer.MAX_VALUE);
 
 		InternalTestHelper.setInternalUserNumber(1);
-		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
+		
+		User user = allUsers.get(0);
 
-		rewardsService.calculateRewards(tourGuideService.getAllUsers().get(0));
-		List<UserReward> userRewards = tourGuideService.getUserRewards(tourGuideService.getAllUsers().get(0));
+		rewardsService.calculateRewards(user);
+		List<UserReward> userRewards = tourGuideService.getUserRewards(user);
 		tourGuideService.tracker.stopTracking();
 
 		assertEquals(gpsUtil.getAttractions().size(), userRewards.size());

@@ -11,15 +11,18 @@ import org.slf4j.LoggerFactory;
 
 import com.openclassrooms.tourguide.model.User;
 import com.openclassrooms.tourguide.service.TourGuideService;
+import com.openclassrooms.tourguide.service.UserService;
 
 public class Tracker extends Thread {
 	private Logger logger = LoggerFactory.getLogger(Tracker.class);
 	private static final long trackingPollingInterval = TimeUnit.MINUTES.toSeconds(5);
 	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 	private final TourGuideService tourGuideService;
+	private final UserService userService; 
 	private boolean stop = false;
 
-	public Tracker(TourGuideService tourGuideService) {
+	public Tracker(TourGuideService tourGuideService, UserService userService) {
+		this.userService = userService;
 		this.tourGuideService = tourGuideService;
 
 		executorService.submit(this);
@@ -42,7 +45,7 @@ public class Tracker extends Thread {
 				break;
 			}
 
-			List<User> users = tourGuideService.getAllUsers();
+			List<User> users = userService.getAllUsers();
 			logger.debug("Begin Tracker. Tracking " + users.size() + " users.");
 			stopWatch.start();
 			users.forEach(u -> tourGuideService.trackUserLocation(u));

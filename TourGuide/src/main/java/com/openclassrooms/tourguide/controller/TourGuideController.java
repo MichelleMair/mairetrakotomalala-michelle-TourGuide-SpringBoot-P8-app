@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import gpsUtil.location.Attraction;
-import gpsUtil.location.VisitedLocation;
-
 import com.openclassrooms.tourguide.model.User;
 import com.openclassrooms.tourguide.model.UserReward;
 import com.openclassrooms.tourguide.service.TourGuideService;
+import com.openclassrooms.tourguide.service.UserService;
 
+import gpsUtil.location.Attraction;
+import gpsUtil.location.VisitedLocation;
 import tripPricer.Provider;
 
 @RestController
@@ -21,6 +21,7 @@ public class TourGuideController {
 
 	@Autowired
 	TourGuideService tourGuideService;
+	UserService userService;
 	
     @RequestMapping("/")
     public String index() {
@@ -58,7 +59,7 @@ public class TourGuideController {
     }
     
     private User getUser(String userName) {
-    	return tourGuideService.getUser(userName);
+    	return userService.getUser(userName);
     }
    
 

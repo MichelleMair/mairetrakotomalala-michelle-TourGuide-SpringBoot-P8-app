@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.openclassrooms.tourguide.helper.InternalTestHelper;
 import com.openclassrooms.tourguide.model.User;
 import com.openclassrooms.tourguide.service.RewardsService;
 import com.openclassrooms.tourguide.service.TourGuideService;
+import com.openclassrooms.tourguide.service.UserService;
 
 import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
@@ -43,29 +45,41 @@ public class TestPerformance {
 	 * assertTrue(TimeUnit.MINUTES.toSeconds(20) >=
 	 * TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	 */
+	private RewardsService rewardsService;
+	private TourGuideService tourGuideService;
+	private GpsUtil gpsUtil;
+	private List<User> allUsers;
 
-
-	@Test
-	public void highVolumeTrackLocation() {
-		GpsUtil gpsUtil = new GpsUtil();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
-		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
+	
+	
+	@BeforeEach
+	public void setUp() {
+		gpsUtil = new GpsUtil();
+		rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+		UserService userService = new UserService();
+		tourGuideService = new TourGuideService(gpsUtil, rewardsService, userService);
 		
 		// Users should be incremented up to 100,000, and test finishes within 15
 		// minutes
 		InternalTestHelper.setInternalUserNumber(100000);
+		allUsers = userService.getAllUsers();
+		
+		tourGuideService.tracker.stopTracking();
+		//Clear users data 
+		tourGuideService.clearUserData(allUsers);
+	}
 
-		List<User> allUsers = tourGuideService.getAllUsers();
 
+	@Test
+	public void highVolumeTrackLocation() {
 		//Starting the performance tracking with a stopwatch 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		
 		//Calling tourGuideService method trackUsersLocation() for mass tracking
-		tourGuideService.trackUsersLocation(allUsers);
+		tourGuideService.trackUsersListLocation(allUsers);
 		
 		stopWatch.stop();
-		tourGuideService.tracker.stopTracking();
 
 		System.out.println("highVolumeTrackLocation: Time Elapsed: "
 				+ TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds.");
@@ -75,16 +89,7 @@ public class TestPerformance {
 
 	@Test
 	public void highVolumeGetRewards() {
-		GpsUtil gpsUtil = new GpsUtil();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
-		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
-		
-		// Users should be incremented up to 100,000, and test finishes within 20
-		// minutes
-		InternalTestHelper.setInternalUserNumber(100000);
-		
-		List<User> allUsers = tourGuideService.getAllUsers();
-		
+
 		// Init visited location for all users
 		Attraction attraction = gpsUtil.getAttractions().get(0);
 		
@@ -96,9 +101,12 @@ public class TestPerformance {
 		stopWatch.start();
 		
 		rewardsService.calculateAllRewards(allUsers);
+		
+		for (User user : allUsers) {
+			assertTrue(user.getUserRewards().size() > 0);
+		}
 	
 		stopWatch.stop();
-		tourGuideService.tracker.stopTracking();
 	
 		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime())
 				+ " seconds.");
