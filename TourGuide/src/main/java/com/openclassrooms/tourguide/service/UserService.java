@@ -47,12 +47,6 @@ public class UserService {
 			internalUserMap.put(user.getUserName(), user);
 		}
 	}
-	
-	/**********************************************************************************
-	 * 
-	 * Methods Below: For Internal Testing
-	 * 
-	 **********************************************************************************/
 
 	public void initializeInternalUsers() {
 		IntStream.range(0, InternalTestHelper.getInternalUserNumber()).forEach(i -> {

@@ -1,7 +1,6 @@
 package com.openclassrooms.tourguide.service;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -13,7 +12,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.openclassrooms.tourguide.dto.NearByAttractionDto;
@@ -39,7 +37,6 @@ public class TourGuideService {
 	public final Tracker tracker;
 	boolean testMode = true;
 
-	@Autowired
 	public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService, UserService userService) {
 		this.gpsUtil = gpsUtil;
 		this.rewardsService = rewardsService;
@@ -89,19 +86,18 @@ public class TourGuideService {
 	//Tracking multiple users in the same time to handle a large group of users
 	public Map<UUID, VisitedLocation> trackUsersListLocation(List<User> users) {
 		logger.info("Démarrage du suivi de localisation pour les users");
-		Map<UUID, VisitedLocation> visitedLocationMap = new HashMap<>();
 		
-		//For each user, run the async task to track user location
-		users.forEach(user -> 
-			CompletableFuture.supplyAsync(() -> {
-				VisitedLocation visitedLocation = trackUserLocation(user);
-				visitedLocationMap.put(user.getUserId(), visitedLocation);
-				logger.info("Localisation suivie pour l'user: " + user.getUserName());
-				return visitedLocation;
-			}, executorService)
-		);
-		logger.info("Suivi de localisation terminé pour tous les users.");
-		//return the map with users locations
+		Map<UUID, CompletableFuture<VisitedLocation>> visitedLocationFutures = users.parallelStream()
+				.collect(Collectors.toMap(
+						User::getUserId, 
+						user -> CompletableFuture.supplyAsync(() -> trackUserLocation(user), executorService)
+						));
+		//Collecte des résultats de chaque future
+		Map<UUID, VisitedLocation> visitedLocationMap = visitedLocationFutures.entrySet().stream()
+				.collect(Collectors.toMap(
+						Map.Entry::getKey, 
+						entry -> entry.getValue().join()
+						));
 		return visitedLocationMap;
 	}
 
@@ -122,11 +118,11 @@ public class TourGuideService {
 	}
 	
 	public void clearUserData(List<User> users) {
-		users.forEach(user -> {
+		for (User user : users){
 			user.clearVisitedLocations();
 			user.getUserRewards().clear();
-			logger.info("Données utilisateur nettoyées avant le test.");
-		});
+		}
+		logger.info("Données utilisateur nettoyées avant le test.");
 	}
 
 	private void addShutDownHook() {

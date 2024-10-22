@@ -102,14 +102,15 @@ public class TestPerformance {
 		
 		rewardsService.calculateAllRewards(allUsers);
 		
-		for (User user : allUsers) {
-			assertTrue(user.getUserRewards().size() > 0);
-		}
+		//Check rewards for each user
+		boolean allRewardsCalculated = allUsers.stream().allMatch(user -> user.getUserRewards().size() > 0);
+		
 	
 		stopWatch.stop();
 	
 		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime())
 				+ " seconds.");
+		assertTrue(allRewardsCalculated, "Tous les utilisateurs devraient avoir des récompenses après le calcul.");
 		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	}
 

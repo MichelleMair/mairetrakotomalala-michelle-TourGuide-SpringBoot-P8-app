@@ -2,15 +2,14 @@ package com.openclassrooms.tourguide.service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.openclassrooms.tourguide.model.User;
@@ -36,7 +35,6 @@ public class RewardsService {
 	private final GpsUtil gpsUtil;
 	private final RewardCentral rewardsCentral;
 
-	@Autowired
 	public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral) {
 		this.gpsUtil = gpsUtil;
 		this.rewardsCentral = rewardCentral;
@@ -53,17 +51,17 @@ public class RewardsService {
 
 	public void calculateRewards(User user) {
 		CopyOnWriteArrayList<VisitedLocation> userLocations =  new CopyOnWriteArrayList<>(user.getVisitedLocations());
-	    List<Attraction> attractions = gpsUtil.getAttractions();
-	        for (VisitedLocation visitedLocation : userLocations) {
-	            for (Attraction attraction : attractions) {
-	            	if (user.getUserRewards().stream().noneMatch(r -> r.attraction.attractionName.equals(attraction.attractionName))) {
-	            		if (nearAttraction(visitedLocation, attraction)) {
-	            			UserReward userReward = new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user.getUserId()));
-	            			user.addUserReward(userReward);
-	            		}
-	            	}
-	            }
-	        }
+		List<Attraction> attractions = gpsUtil.getAttractions();
+			for (VisitedLocation visitedLocation : userLocations) {
+				for (Attraction attraction : attractions) {
+					if (user.getUserRewards().stream().noneMatch(r -> r.attraction.attractionName.equals(attraction.attractionName))) {
+						if (nearAttraction(visitedLocation, attraction)) {
+							UserReward userReward = new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user.getUserId()));
+							user.addUserReward(userReward);
+						}
+					}
+				}
+			}
 	}
 	
 	
@@ -73,26 +71,15 @@ public class RewardsService {
 	 * @param users the list of users for whom rewards are calculated
 	 */
 	public void calculateAllRewards(List<User> users) {
-		CountDownLatch cdLatch = new CountDownLatch(users.size());
+		logger.info("Début du calcul des récompenses pour {} utilisateurs." , users.size());
 		
-		for (User user : users) {
-			executorService.submit(() -> {
-				try {
-					calculateRewards(user);
-				} finally {
-					cdLatch.countDown();
-				}
-			});
-		}
-		try {
-			if(!cdLatch.await(20, TimeUnit.MINUTES)) {
-				logger.info("Le temps d'attente a expiré pour les calculs de récompenses. ");
-			}
-		} catch (InterruptedException ie) {
-			Thread.currentThread().interrupt();
-			ie.printStackTrace();
-		}
-			logger.info("Calcul des récompenses terminé pour tous les users.");
+		List<CompletableFuture<Void>> rewardFutures = users.stream()
+				.map(user -> CompletableFuture.runAsync(() ->
+				calculateRewards(user), executorService))
+				.collect(Collectors.toList());
+		
+		CompletableFuture.allOf(rewardFutures.toArray(new CompletableFuture[0])).join();
+		logger.info("Calcul des récompenses terminé pour tous les users.");
 	}
 	
 	
