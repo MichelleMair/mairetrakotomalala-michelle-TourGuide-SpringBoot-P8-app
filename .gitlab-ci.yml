@@ -18,18 +18,21 @@ stages:
 compile:
   stage: compile
   script:
+    - cd TourGuide
     - mvn compile
 
 # Étape 2: Lancement des tests (les tests de performances sont désactivés pendant la configuration initiale)
 test:
   stage: test
   script:
+    - cd TourGuide
     - mvn test -DskipPerformanceTests=true # Désactivation des tests ici
 
 # Étape 3: Construire les artefacts (build)
 build:
   stage: build
   script:
+    - cd TourGuide
     - mvn clean package
   artifacts:
     paths:
