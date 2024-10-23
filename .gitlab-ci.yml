@@ -15,7 +15,6 @@ stages:
   - package
 
 before_script:
- - echo "Using Maven version $(mvn -v)"
  - docker info
 
 
@@ -23,15 +22,16 @@ before_script:
 build:
   stage: build
   script:
-    - docker build -t tourguide-app .
+    - docker build -t tourguide-app ./TourGuide
+
 
 # Étape 2: Lancement des tests (les tests de performances sont désactivés pendant la configuration initiale)
 test:
   stage: test
   script:
-    - docker run tourguide-app mvn test -DskipPerformanceTests=true # Désactivation des tests ici
+    - docker run tourguide-app mvn test -Dgroups=!Performance # Désactivation des tests ici
 
-# Étape 3: Construire les artefacts (build)
+# Étape 3: Construire les artefacts (package)
 package:
   stage: package
   script:
@@ -40,4 +40,4 @@ package:
   # Sauvegarde du fichier jar généré comme artefact
   artifacts:
     paths:
-      - target/*.jar  # Le jar sera sauvegardé comme artefact
+      - TourGuide/target/*.jar  # Le jar sera sauvegardé comme artefact
