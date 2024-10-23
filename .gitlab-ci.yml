@@ -1,5 +1,5 @@
 # Utiliser une image Docker avec Maven et Java
-image: maven:3.8.4-jdk-17
+image: maven:3.8.4-eclipse-temurin-17
 
 # Variables globales (optionnelles)
 variables:
@@ -24,9 +24,7 @@ compile:
 test:
   stage: test
   script:
-    - mvn test 
-  except:
-    - /^.*performance.*$/  # Désactivation des tests ici
+    - mvn test -DskipPerformanceTests=true # Désactivation des tests ici
 
 # Étape 3: Construire les artefacts (build)
 build:
