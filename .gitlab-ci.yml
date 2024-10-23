@@ -29,13 +29,13 @@ build:
 test:
   stage: test
   script:
-    - docker run tourguide-app mvn test -Dgroups=!Performance # Désactivation des tests ici
+    - docker run tourguide-app mvn -f /app/pom.xml test -Dgroups=!Performance # Désactivation des tests ici
 
 # Étape 3: Construire les artefacts (package)
 package:
   stage: package
   script:
-    - docker run tourguide-app mvn clean package
+    - docker run tourguide-app mvn -f /app/pom.xml clean package
   
   # Sauvegarde du fichier jar généré comme artefact
   artifacts:
