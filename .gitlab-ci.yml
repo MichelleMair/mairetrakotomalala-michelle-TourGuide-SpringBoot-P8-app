@@ -32,9 +32,6 @@ test:
 build:
   stage: build
   script:
-    # Création du répertoire pour les fichiers jar dans m2
-    - mkdir -p ~/.m2/repository/libs
-
     # Installations des fichiers jar dans le repository Maven local
     - mvn install:install-file -Dfile=libs/gpsUtil.jar -DgroupId=gpsUtil -DartifactId=gpsUtil -Dversion=1.0.0 -Dpackaging=jar
     - mvn install:install-file -Dfile=libs/RewardCentral.jar -DgroupId=rewardCentral -DartifactId=rewardCentral -Dversion=1.0.0 -Dpackaging=jar
