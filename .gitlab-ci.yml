@@ -22,7 +22,7 @@ before_script:
 build:
   stage: build
   script:
-    - docker build -t tourguide-app ./TourGuide
+    - docker build -t tourguide-app -f TourGuide/Dockerfile TourGuide/
 
 
 # Étape 2: Lancement des tests (les tests de performances sont désactivés pendant la configuration initiale)
