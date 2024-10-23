@@ -1,0 +1,38 @@
+# Utiliser une image Docker avec Maven et Java
+image: maven:3.8.4-jdk-17
+
+# Variables globales (optionnelles)
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+before_script:
+ - echo "Using Maven version $(mvn -v)"
+
+# Stages de pipeline
+stages:
+  - compile
+  - test
+  - build
+
+# Étape 1: Compilation du projet
+compile:
+  stage: compile
+  script:
+    - mvn compile
+
+# Étape 2: Lancer les tests (les tests de performances sont désactivés pendant la configuration initiale)
+test:
+  stage: test
+  script:
+    - mvn test 
+  except:
+    - /^.*performance.*$/  # Désactivation des tests ici
+
+# Étape 3: Construire les artefacts (build)
+build:
+  stage: build
+  script:
+    - mvn clean package
+  artifacts:
+    paths:
+      - target/*.jar  # Le jar sera sauvegardé comme artefact
