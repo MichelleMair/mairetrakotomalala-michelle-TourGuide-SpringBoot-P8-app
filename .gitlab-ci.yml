@@ -1,47 +1,41 @@
 # Utiliser une image Docker avec Maven et Java
-image: maven:3.8.4-eclipse-temurin-17
+image: docker:latest
 
-# Variables globales (optionnelles)
+services:
+  - docker:dind
+
 variables:
+  DOCKER_DRIVER: overlay2
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-
-before_script:
- - echo "Using Maven version $(mvn -v)"
-
- # Installations des fichiers jar dans le repository Maven local
- - mvn install:install-file -Dfile=libs/gpsUtil.jar -DgroupId=gpsUtil -DartifactId=gpsUtil -Dversion=1.0.0 -Dpackaging=jar
- - mvn install:install-file -Dfile=libs/RewardCentral.jar -DgroupId=rewardCentral -DartifactId=rewardCentral -Dversion=1.0.0 -Dpackaging=jar
- - mvn install:install-file -Dfile=libs/TripPricer.jar -DgroupId=tripPricer -DartifactId=tripPricer -Dversion=1.0.0 -Dpackaging=jar
 
 # Stages de pipeline
 stages:
-  - compile
-  - test
   - build
+  - test
+  - package
+
+before_script:
+ - echo "Using Maven version $(mvn -v)"
+ - docker info
+
 
 # Étape 1: Compilation du projet
-compile:
-  stage: compile
+build:
+  stage: build
   script:
-    - cd TourGuide
-    - mvn compile
+    - docker build -t tourguide-app .
 
 # Étape 2: Lancement des tests (les tests de performances sont désactivés pendant la configuration initiale)
 test:
   stage: test
   script:
-    - cd TourGuide
-    - mvn test -DskipPerformanceTests=true # Désactivation des tests ici
+    - docker run tourguide-app mvn test -DskipPerformanceTests=true # Désactivation des tests ici
 
 # Étape 3: Construire les artefacts (build)
-build:
-  stage: build
+package:
+  stage: package
   script:
-    # Aller dans le répertoire du projet pour accéder au pom.xml
-    - cd TourGuide
-
-    # Nettoyer et construire le package
-    - mvn clean package
+    - docker run tourguide-app mvn clean package
   
   # Sauvegarde du fichier jar généré comme artefact
   artifacts:
