@@ -20,7 +20,7 @@ compile:
   script:
     - mvn compile
 
-# Étape 2: Lancer les tests (les tests de performances sont désactivés pendant la configuration initiale)
+# Étape 2: Lancement des tests (les tests de performances sont désactivés pendant la configuration initiale)
 test:
   stage: test
   script:
