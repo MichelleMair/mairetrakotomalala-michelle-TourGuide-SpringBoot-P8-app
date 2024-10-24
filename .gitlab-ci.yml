@@ -21,7 +21,6 @@ stages:
   - package
 
 before_script:
- - docker info
  - mvn --version
 
 
@@ -39,14 +38,23 @@ build_job:
     paths:
       - .m2/repository
 
-# Étape 2: Création de l'image après compilation avec Docker
-docker_build:
-  stage: package
-  image: docker:latest # Passe à une image Docker ici pour les commandes Docker
+# Étape 2: Lancement des tests (les tests de performances sont désactivés pendant la configuration initiale)
+test_job:
+  stage: test
   script:
-    - docker_build -t tourguide-app -f TourGuide/Dockerfile TourGuide/
+    - mvn test -DskipPerformanceTests=true  # Désactivation des tests ici
   dependencies:
     - build_job
+
+# Étape Docker: Construire de l'image après compilation
+docker_build:
+  stage: package
+  image: docker:latest # Image Docker uniquement pour la partie Docker
+  script:
+    - docker build -t tourguide-app -f TourGuide/Dockerfile TourGuide/
+  dependencies:
+    - build_job
+  
   # Sauvegarde du fichier jar généré comme artefact
   artifacts:
     paths:
