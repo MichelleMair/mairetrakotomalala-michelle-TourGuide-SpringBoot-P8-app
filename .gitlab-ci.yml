@@ -28,7 +28,7 @@ build_job:
   stage: build
   script:
     # Temp: liste des fichiers dans TourGuide
-    - ls -al TourGuide/
+    - ls -al TourGuide/libs/
     - cd TourGuide # Accès au pom.xml
     - mvn install:install-file -Dfile=libs/gpsUtil.jar -DgroupId=gpsUtil -DartifactId=gpsUtil -Dversion=1.0.0 -Dpackaging=jar
     - mvn install:install-file -Dfile=libs/RewardCentral.jar -DgroupId=rewardCentral -DartifactId=rewardCentral -Dversion=1.0.0 -Dpackaging=jar
@@ -57,6 +57,7 @@ docker_build:
   image: docker:latest # Image Docker uniquement pour la partie Docker
   script:
     - docker build -t tourguide-app -f TourGuide/Dockerfile TourGuide/
+    - docker image ls # Vérification des images Docker
   dependencies:
     - build_job
   
