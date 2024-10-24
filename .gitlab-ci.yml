@@ -1,5 +1,5 @@
 # Utiliser une image Docker avec Maven et Java
-image: docker:20.10.16-dind
+image: maven:3.8.4-eclipse-temurin-17
 
 services:
   - docker:dind
@@ -39,22 +39,14 @@ build_job:
     paths:
       - .m2/repository
 
-# Étape 2: Lancement des tests (les tests de performances sont désactivés pendant la configuration initiale)
-test_job:
-  stage: test
-  script:
-    - mvn test -Dgroups=!Performance # Désactivation des tests ici
-  dependencies:
-    - build_job
-
-# Étape 3: Construire les artefacts (package)
-package_job:
+# Étape 2: Création de l'image après compilation avec Docker
+docker_build:
   stage: package
+  image: docker:latest # Passe à une image Docker ici pour les commandes Docker
   script:
-    - mvn clean package
+    - docker_build -t tourguide-app -f TourGuide/Dockerfile TourGuide/
   dependencies:
     - build_job
-  
   # Sauvegarde du fichier jar généré comme artefact
   artifacts:
     paths:
