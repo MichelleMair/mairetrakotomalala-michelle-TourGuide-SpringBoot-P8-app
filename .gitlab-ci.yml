@@ -43,11 +43,13 @@ build_job:
 test_job:
   stage: test
   script:
+    - cd TourGuide # Accès au pom.xml
+    - mvn --version
     - mvn test -DskipPerformanceTests=true  # Désactivation des tests ici
   dependencies:
     - build_job
 
-# Étape Docker: Construire de l'image après compilation
+# Étape 3: Docker: Construire de l'image après compilation
 docker_build:
   stage: package
   image: docker:latest # Image Docker uniquement pour la partie Docker
