@@ -23,7 +23,6 @@ stages:
 before_script:
  - mvn --version
 
-
 # Étape 1: Compilation du projet
 build_job:
   stage: build
