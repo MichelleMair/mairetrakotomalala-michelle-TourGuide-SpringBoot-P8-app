@@ -49,6 +49,9 @@ test_job:
     - mvn test  # Désactivation des tests ici
   dependencies:
     - build_job
+  cache:
+    paths:
+      - .m2/repository
   only:
     - master
     - dev
