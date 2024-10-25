@@ -46,7 +46,6 @@ build_job:
 test_job:
   stage: test
   script:
-    - cd TourGuide # Accès au pom.xml
     - mvn test  # Désactivation des tests ici
   dependencies:
     - build_job
