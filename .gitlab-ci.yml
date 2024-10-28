@@ -1,5 +1,5 @@
 # Utiliser une image Docker avec Docker-in-Docker
-image: docker:20.10.8
+image: maven:3.8.4-openjdk-17
 
 services:
   - name: docker:dind
@@ -12,10 +12,6 @@ variables:
 
 
 before_script:
-  - apk update
-  - apk add openjdk17 maven
-  - export JAVA_HOME="/usr/lib/jvm/java-17-openjdk" # Définition JAVA_HOME
-  - export PATH="$JAVA_HOME/bin:$PATH" # Ajout de Java au PATH
   - java --version
   - mvn --version
   - cd TourGuide
