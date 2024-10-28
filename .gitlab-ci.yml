@@ -58,7 +58,7 @@ test_job:
 # Étape 3: Docker: Construire de l'image après compilation
 docker_build:
   stage: package
-  image: maven:3.8.4-docker # utilisation d'une image Maven qui inclut Docker
+  image: maven:3.8.4-eclipse-temurin-17 # utilisation d'une image Maven qui inclut Docker
   script:
     #Construction de l'image Docker
     - docker build -t tourguide-app -f TourGuide/Dockerfile TourGuide/
