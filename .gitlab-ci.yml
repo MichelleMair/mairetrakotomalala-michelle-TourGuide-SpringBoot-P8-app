@@ -12,8 +12,6 @@ variables:
 # Caching Maven repository to reuse dependencies
 default:
   before_script:
-    - export JAVA_HOME="/usr/local/openjdk-17" # Définition du JAVA_HOME pour java 17
-    - export PATH="$JAVA_HOME/bin:$PATH" # Ajout de Java 17 au PATH
     - java --version
     - mvn --version
     - cd TourGuide
