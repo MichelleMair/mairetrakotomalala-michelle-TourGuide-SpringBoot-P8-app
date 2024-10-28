@@ -64,7 +64,9 @@ docker_build:
   stage: package
   script:
     #Construction de l'image Docker
-    - apt-get update && apt-get install -y docker.io
+    - apk update && apk add --no-cache docker
+    - docker & # Démarrage de daemon Docker
+    - sleep 5 # Attente pour que daemon Docker soit prêt
     - docker build -t tourguide-app -f TourGuide/Dockerfile TourGuide/
     - docker image ls # Vérification des images Docker
   dependencies:
