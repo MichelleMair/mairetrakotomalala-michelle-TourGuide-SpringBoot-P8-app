@@ -1,5 +1,5 @@
 # Utiliser une image Docker avec Docker-in-Docker
-image: docker:20.10.8-dind
+image: maven:3.8.4-openjdk-17
 
 services:
   - name: docker:dind
@@ -7,12 +7,12 @@ services:
 variables:
   MAVEN_OPTS: >-
     -Dmaven.repo.local=.m2/repository
+  DOCKER_HOST: tcp//docker:2375
 
 # Caching Maven repository to reuse dependencies
 default:
   before_script:
-    - apk add --no-cache maven openjdk17 # Installation de Maven
-    - export JAVA_HOME="/usr/lib/jvm/java-17-openjdk" # Définition du JAVA_HOME pour java 17
+    - export JAVA_HOME="/usr/local/openjdk-17" # Définition du JAVA_HOME pour java 17
     - export PATH="$JAVA_HOME/bin:$PATH" # Ajout de Java 17 au PATH
     - java --version
     - mvn --version
@@ -65,10 +65,6 @@ docker_build:
   stage: package
   script:
     #Construction de l'image Docker
-    - apk add --no-cache docker openrc # Installation de Docker si nécessaire
-    - dockerd & # Démarrage de deamon Docker
-    - sleep 5 # Attendre que Docker démarre
-    - docker --version #Vérification que Docker est accessible
     - docker build -t tourguide-app -f TourGuide/Dockerfile TourGuide/
     - docker image ls # Vérification des images Docker
   dependencies:
