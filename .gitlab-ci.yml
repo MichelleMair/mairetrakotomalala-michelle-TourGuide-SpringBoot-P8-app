@@ -1,9 +1,8 @@
-# Utiliser une image Docker avec Maven et Java
-image: maven:3.8.4-eclipse-temurin-17
+# Utiliser une image Docker avec Docker-in-Docker
+image: docker:20.10.8-dind
 
 services:
   - name: docker:dind
-    command: ["--privileged"]
 
 variables:
   MAVEN_OPTS: >-
@@ -12,6 +11,7 @@ variables:
 # Caching Maven repository to reuse dependencies
 default:
   before_script:
+    - apk add --no-cache maven # Installation de Maven
     - cd TourGuide
     - mkdir -p .m2/repository
     - mvn --version
@@ -61,6 +61,9 @@ docker_build:
   stage: package
   script:
     #Construction de l'image Docker
+    - apk add --no-cache docker openrc # Installation de Docker si nécessaire
+    - dockerd & # Démarrage de deamon Docker
+    - sleep 5 # Attendre que Docker démarre
     - docker --version #Vérification que Docker est accessible
     - docker build -t tourguide-app -f TourGuide/Dockerfile TourGuide/
     - docker image ls # Vérification des images Docker
