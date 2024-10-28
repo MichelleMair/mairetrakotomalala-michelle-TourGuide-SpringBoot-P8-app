@@ -12,8 +12,9 @@ variables:
 
 
 before_script:
-  - apt-get update && apt-get install -y openjdk-17-jdk maven
-  - export JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64" # Définition JAVA_HOME
+  - apk update
+  - apk add openjdk17 maven
+  - export JAVA_HOME="/usr/lib/jvm/java-17-openjdk" # Définition JAVA_HOME
   - export PATH="$JAVA_HOME/bin:$PATH" # Ajout de Java au PATH
   - java --version
   - mvn --version
