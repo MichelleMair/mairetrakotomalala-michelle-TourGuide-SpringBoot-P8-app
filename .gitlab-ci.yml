@@ -11,10 +11,14 @@ variables:
 # Caching Maven repository to reuse dependencies
 default:
   before_script:
-    - apk add --no-cache maven # Installation de Maven
+    - apk add --no-cache maven openjdk17 # Installation de Maven
+    - export JAVA_HOME="/usr/lib/jvm/java-17-openjdk" # Définition du JAVA_HOME pour java 17
+    - export PATH="$JAVA_HOME/bin:$PATH" # Ajout de Java 17 au PATH
+    - java --version
+    - mvn --version
     - cd TourGuide
     - mkdir -p .m2/repository
-    - mvn --version
+
   cache:
     paths:
       - .m2/repository
