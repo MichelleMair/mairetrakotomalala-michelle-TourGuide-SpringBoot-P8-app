@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.openclassrooms.tourguide.helper.InternalTestHelper;
@@ -32,11 +31,12 @@ public class TestRewardsService {
 	
 	@BeforeEach
 	public void setUp() {
+		InternalTestHelper.setInternalUserNumber(1);
 		gpsUtil = new GpsUtil();
 		rewardsService = new RewardsService(gpsUtil, new RewardCentral());		
 		UserService userService = new UserService();
 		tourGuideService = new TourGuideService(gpsUtil, rewardsService, userService);
-		
+		userService.initializeInternalUsers();
 		allUsers = userService.getAllUsers();
 	}
 
@@ -59,13 +59,11 @@ public class TestRewardsService {
 		assertTrue(rewardsService.isWithinAttractionProximity(attraction, attraction));
 	}
 
-	@Disabled  //fixed
+	//fixed
 	@Test
 	public void nearAllAttractions() {
 		rewardsService.setProximityBuffer(Integer.MAX_VALUE);
-
-		InternalTestHelper.setInternalUserNumber(1);
-		
+	
 		User user = allUsers.get(0);
 
 		rewardsService.calculateRewards(user);
@@ -73,6 +71,7 @@ public class TestRewardsService {
 		tourGuideService.tracker.stopTracking();
 
 		assertEquals(gpsUtil.getAttractions().size(), userRewards.size());
+		assertTrue(allUsers.size() > 0, "la liste allUsers ne devrait pas être vide");
 	}
 
 }
