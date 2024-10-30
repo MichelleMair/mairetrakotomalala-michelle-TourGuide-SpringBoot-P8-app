@@ -99,7 +99,7 @@ jobs:
               password: ${{ secrets.DOCKER_PASSWORD }}
 
           - name: Build Docker image
-            run: docker build -t MichelleMairDocker/tourguide-app:latest -f TourGuide/Dockerfile .
+            run: docker build -t ${{ secrets.DOCKER_USERNAME }}/tourguide-app:latest -f TourGuide/Dockerfile .
             
           - name: Push Docker image to Docker Hub
-            run: docker push MichelleMairDocker/tourguide-app:latest        
+            run: docker push ${{ secrets.DOCKER_USERNAME }}/tourguide-app:latest        
