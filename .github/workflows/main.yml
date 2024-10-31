@@ -78,7 +78,7 @@ jobs:
                 mvn install:install-file -Dfile=TourGuide/libs/TripPricer.jar -DgroupId=tripPricer -DartifactId=tripPricer -Dversion=1.0.0 -Dpackaging=jar
                     
             - name: Run tests with Maven
-              run: mvn -f TourGuide/pom.xml test 
+              run: mvn -f TourGuide/pom.xml test
 
     docker_build:
         runs-on: ubuntu-latest
