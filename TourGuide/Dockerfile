@@ -1,7 +1,7 @@
 # Étape de construction
 FROM maven:3.8.4-eclipse-temurin-17 AS build
 WORKDIR /app
-COPY TourGuide /app # Copie tout le contenu de 'TourGuide'
+COPY . .
 RUN mvn install:install-file -Dfile=libs/gpsUtil.jar -DgroupId=gpsUtil -DartifactId=gpsUtil -Dversion=1.0.0 -Dpackaging=jar && \
     mvn install:install-file -Dfile=libs/RewardCentral.jar -DgroupId=rewardCentral -DartifactId=rewardCentral -Dversion=1.0.0 -Dpackaging=jar && \
     mvn install:install-file -Dfile=libs/TripPricer.jar -DgroupId=tripPricer -DartifactId=tripPricer -Dversion=1.0.0 -Dpackaging=jar && \

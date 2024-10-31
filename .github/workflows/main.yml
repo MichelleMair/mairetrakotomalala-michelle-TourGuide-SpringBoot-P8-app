@@ -94,8 +94,8 @@ jobs:
             - name: Build and push Docker image
               uses: docker/build-push-action@v3
               with:
-                context: .
-                file: TourGuide/Dockerfile
+                context: ./TourGuide
+                file: ./TourGuide/Dockerfile
                 push: true
                 tags: "${{ secrets.DOCKER_USERNAME }}/tourguide-app:latest"
                 username: ${{ secrets.DOCKER_USERNAME }}
