@@ -92,12 +92,12 @@ jobs:
               uses: docker/setup-buildx-action@v2
 
             - name: Build and push Docker image
-               uses: docker/build-push-action@v3
-               with:
+              uses: docker/build-push-action@v3
+              with:
                 context: .
                 file: TourGuide/Dockerfile
                 push: true
                 tags: "${{ secrets.DOCKER_USERNAME }}/tourguide-app:latest"
-            secrets:
-              username: ${{ secrets.DOCKER_USERNAME }}
-              password: ${{ secrets.DOCKER_PASSWORD }}
+              secrets:
+                username: ${{ secrets.DOCKER_USERNAME }}
+                password: ${{ secrets.DOCKER_PASSWORD }}
