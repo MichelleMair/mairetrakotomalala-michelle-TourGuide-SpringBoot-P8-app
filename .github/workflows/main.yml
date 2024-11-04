@@ -40,9 +40,11 @@ jobs:
                 mvn install:install-file -Dfile=TourGuide/libs/TripPricer.jar -DgroupId=tripPricer -DartifactId=tripPricer -Dversion=1.0.0 -Dpackaging=jar
                 mvn clean package
                 
-        artifacts:
-            paths:
-                - TourGuide/target/*.jar
+            - name: Upload artifact
+              uses: actions/upload-artifact@v2
+              with:
+                name: tourguide-jar
+                path: TourGuide/target*.jar
               
     test:
         runs-on: ubuntu-latest
