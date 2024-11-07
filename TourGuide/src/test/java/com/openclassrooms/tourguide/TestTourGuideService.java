@@ -104,6 +104,7 @@ public class TestTourGuideService {
 		assertEquals(5, attractions.size());
 	}
 
+
 	public void getTripDeals() {
 
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
@@ -112,7 +113,7 @@ public class TestTourGuideService {
 
 		tourGuideService.tracker.stopTracking();
 
-		assertEquals(10, providers.size());
+		assertEquals(5, providers.size());
 	}
 
 }

@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.openclassrooms.tourguide.helper.InternalTestHelper;
@@ -70,7 +69,7 @@ public class TestPerformance {
 		tourGuideService.clearUserData(allUsers);
 	}
 
-	@Disabled
+	//@Disabled
 	@Test
 	public void highVolumeTrackLocation() {
 		//Starting the performance tracking with a stopwatch 
@@ -87,7 +86,7 @@ public class TestPerformance {
 		assertTrue(TimeUnit.MINUTES.toSeconds(15) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	}
 
-	@Disabled
+	//@Disabled
 	@Test
 	public void highVolumeGetRewards() {
 
