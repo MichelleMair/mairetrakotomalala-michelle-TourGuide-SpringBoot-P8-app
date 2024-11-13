@@ -83,7 +83,16 @@ public class TourGuideService {
 		return visitedLocation;
 	}
 	
-	//Tracking multiple users in the same time to handle a large group of users
+
+	/**
+	 * Tracking multiple users in the same time to handle a large group of users
+	 * and returns a map of user IDs to their latest visited locations. 
+	 * This method initiates asynchronous location tracking for each user in the provided list, allowing efficient processing of large user groups. 
+	 * Each user's location is retrieved concurrently using a CompletableFuture for performance optimization
+	 * 
+	 * @param users the list of users whose locations are to be tracked
+	 * @return a map where the keys are user IDs (UUIDs) and the values are the latest visited locations (VisitedLocation) for each user
+	 */
 	public Map<UUID, VisitedLocation> trackUsersListLocation(List<User> users) {
 		logger.info("Démarrage du suivi de localisation pour les users");
 		

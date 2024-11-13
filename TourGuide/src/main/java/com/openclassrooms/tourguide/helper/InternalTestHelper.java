@@ -1,5 +1,11 @@
 package com.openclassrooms.tourguide.helper;
 
+/**
+ * InternalTestHelper class provideshelper methods and properties for configuring 
+ * the number of internal users used for testing purposes in the TourGuide app
+ * This class allows for customization of the internal user count to facalitate
+ * large-scale performance tests. 
+ */
 public class InternalTestHelper {
 
 	// Set this default up to 100,000 for testing

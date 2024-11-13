@@ -49,6 +49,15 @@ public class RewardsService {
 	}
 	
 
+	/**
+	 * Calculates and assigns rewards for the specified used based on their visited locations and nearby attractions.
+	 * 
+	 * For each visited location of the user, this method checks if there are nearby attractions
+	 * thaht have not yet bee rewarded. 
+	 * If an attraction is close enough, a reward is calculated and added to the user's list of rewards
+	 * 
+	 * @param user
+	 */
 	public void calculateRewards(User user) {
 		CopyOnWriteArrayList<VisitedLocation> userLocations =  new CopyOnWriteArrayList<>(user.getVisitedLocations());
 		List<Attraction> attractions = gpsUtil.getAttractions();
@@ -66,7 +75,12 @@ public class RewardsService {
 	
 	
 	/**
-	 * Calculate rewards for all users in parallel
+	 * Calculate rewards for all users in parallel.
+	 * 
+	 * This method initiates asynchronous reward calculations for each user in the provided list,
+	 * improving performance by processing calculatons concurrently.
+	 * 
+	 * Once all calculations are completed, the method waits for each asynchronous task to finish
 	 * 
 	 * @param users the list of users for whom rewards are calculated
 	 */
@@ -79,7 +93,6 @@ public class RewardsService {
 				.collect(Collectors.toList());
 		
 		CompletableFuture.allOf(rewardFutures.toArray(new CompletableFuture[0])).join();
-		logger.info("Calcul des récompenses terminé pour tous les users.");
 	}
 	
 	
