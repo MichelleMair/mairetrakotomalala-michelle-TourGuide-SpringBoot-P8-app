@@ -3,10 +3,12 @@ package com.openclassrooms.tourguide.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.openclassrooms.tourguide.dto.NearByAttractionDto;
 import com.openclassrooms.tourguide.model.User;
@@ -47,6 +49,9 @@ public class TourGuideController {
     @ResponseBody
     public List<NearByAttractionDto> getNearbyAttractions(@RequestParam String userName) {
     	User user = userService.getUser(userName);
+    	if (user == null) {
+    		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + userName);
+    	}
     	VisitedLocation visitedLocation = tourGuideService.getUserLocation(user);
     	return tourGuideService.getNearByAttractions(visitedLocation);
     }

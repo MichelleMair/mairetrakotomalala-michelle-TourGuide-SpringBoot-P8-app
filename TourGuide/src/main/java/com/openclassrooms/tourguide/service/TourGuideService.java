@@ -47,7 +47,8 @@ public class TourGuideService {
 		if (testMode) {
 			logger.info("TestMode enabled");
 			logger.debug("Initializing users");
-			userService.initializeInternalUsers();
+			userService.initializeInternalUsers(); //generate default users
+			userService.addTestUserJohnDoe(); //add JohnDoe for test purposes
 			logger.debug("Finished initializing users");
 		}
 		tracker = new Tracker(this, userService); 
