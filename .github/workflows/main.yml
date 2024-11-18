@@ -45,6 +45,13 @@ jobs:
               with:
                 name: tourguide-jar
                 path: ./TourGuide/target/*.jar
+                
+            - name: Deploy locally
+              working-directory: TourGuide
+              run: |
+                java -jar target/tourguide-0.0.1-SNAPSHOT.jar &
+                sleep 30 # Wait for the application to start
+                curl -I http://localhost:8080 # Test if the application is running
               
     test:
         runs-on: ubuntu-latest
