@@ -47,6 +47,14 @@ public class UserService {
 			internalUserMap.put(user.getUserName(), user);
 		}
 	}
+	
+	public void addTestUserJohnDoe() {
+		if(!internalUserMap.containsKey("JohnDoe")) {
+			User user = new User (UUID.randomUUID(), "JohnDoe", "0000", "johndoe@tourguide.com");
+			generateUserLocationHistory(user); //generate user locations
+			internalUserMap.put(user.getUserName(), user); //add to the internal map
+		}
+	}
 
 	public void initializeInternalUsers() {
 		IntStream.range(0, InternalTestHelper.getInternalUserNumber()).forEach(i -> {
